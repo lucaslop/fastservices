@@ -15,7 +15,31 @@ class UserController {
     });
   }
   async update(req, res) {
-    console.log(req.userId);
+    const user = User.findByPk(req.userId);
+    const { email, oldPassword } = req.body;
+
+    if (email != user.email) {
+      const existEmail = User.findOne({ where: { email: email } });
+
+      if (existEmail) {
+        return res.json("email já cadastrado");
+      }
+
+      user.email = email;
+    }
+
+    if (oldPassword && !(await user.checkPassword(oldPassword))) {
+      return res.status(401).json({ error: "Senha incorreta" });
+    }
+
+    const { name, provider } = req.body;
+    return res.json({
+      user: {
+        name,
+        email,
+        provider
+      }
+    });
   }
 }
 
