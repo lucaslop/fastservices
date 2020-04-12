@@ -7,11 +7,15 @@ import * as Yup from "yup";
 class AppointmentsController {
   //mostrando agendamentos do usuario
   async index(req, res) {
+    const { page = 1 } = req.query;
     const appointments = await Appointments.findAll({
       where: {
         id: req.userId,
         canceled_at: null
       },
+      order: ["date"],
+      limit: 20,
+      offset: (page - 1) * 20,
       attributes: ["id", "date"],
       include: [
         {
