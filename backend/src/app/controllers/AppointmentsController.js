@@ -1,4 +1,5 @@
 import Appointments from "../models/Appointments";
+import { startOfHour, parseISO, isBefore } from "date-fns";
 import User from "../models/User";
 import * as Yup from "yup";
 class AppointmentsController {
@@ -23,6 +24,22 @@ class AppointmentsController {
         .json({ error: "Só é possivel agendar com prestadores de serviço" });
     }
 
+    const hourStart = startOfHour(parseISO(date));
+    if (isBefore(hourStart, new Date())) {
+      return res.status(400).json({ error: "Horario invalido" });
+    }
+
+    const checkAvaliabity = await Appointments.findAll({
+      where: {
+        provider_id,
+        canceled_at: null,
+        date: hourStart
+      }
+    });
+
+    if (checkAvaliabity) {
+      return res.status(400).json({ error: "Horario já marcado" });
+    }
     const appointment = await Appointments.create({
       user_id: req.userId,
       provider_id,
