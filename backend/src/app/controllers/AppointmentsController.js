@@ -1,8 +1,10 @@
 import Appointments from "../models/Appointments";
 import File from "../models/File";
 import User from "../models/User";
-import { startOfHour, parseISO, isBefore } from "date-fns";
+import { startOfHour, parseISO, isBefore, format } from "date-fns";
 import User from "../models/User";
+import Notification from "../schema/Notification";
+import pt from "date-fns/locale/pt";
 import * as Yup from "yup";
 class AppointmentsController {
   //mostrando agendamentos do usuario
@@ -72,6 +74,19 @@ class AppointmentsController {
     if (checkAvaliabity) {
       return res.status(400).json({ error: "Horario já marcado" });
     }
+    const user = User.findByPk(req.userId);
+    const formattedDate = format(
+      hourStart,
+      "'dia' dd 'de' MMMM', às' H:mm'h'",
+      {
+        locate: pt
+      }
+    );
+    await Notification.create({
+      content: `Novo agendamento de : ${user.name} para o ${formattedDate}  `,
+      user: provider_id
+    });
+
     const appointment = await Appointments.create({
       user_id: req.userId,
       provider_id,
