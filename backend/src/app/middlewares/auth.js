@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-
 import authConfig from "../../config/auth";
 
 import { promisify } from "util";
@@ -8,7 +7,6 @@ export default async (req, res, next) => {
   if (!authHeader) {
     return res.status(400).json({ error: "Token inválido" });
   }
-
   const [, token] = authHeader.split(" ");
   try {
     const decode = await promisify(jwt.verify)(token, authConfig.secret);
