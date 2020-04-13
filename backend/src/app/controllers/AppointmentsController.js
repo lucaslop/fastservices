@@ -6,6 +6,7 @@ import User from "../models/User";
 import Notification from "../schema/Notification";
 import pt from "date-fns/locale/pt";
 import * as Yup from "yup";
+import Mail from "../../lib/Mail";
 class AppointmentsController {
   //mostrando agendamentos do usuario
   async index(req, res) {
@@ -110,8 +111,16 @@ class AppointmentsController {
         error: "Você só pode cancelar agendamentos em até duas horas antes"
       });
     }
+
     appointment.canceled_at = new Date();
     await appointment.save();
+    const provider = await User.findByPk(appointment.provider_id);
+    await Mail.sendEmail({
+      to: `${provider.name} <${provider.email}>`,
+      subject: "Agendamento Cancelado",
+      text: "você tem um novo cancelamento"
+    });
+
     return res.json(appointment);
   }
 }
