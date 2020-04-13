@@ -3,6 +3,7 @@ import routes from "./routes";
 import path from "path";
 import mongoose from "mongoose";
 import "./database";
+import "dotenv/config";
 class App {
   constructor() {
     this.server = express();
@@ -22,13 +23,10 @@ class App {
     this.server.use(routes);
   }
   mongo() {
-    this.mongoConnection = mongoose.connect(
-      "mongodb://localhost:27017/fastservice",
-      {
-        useNewUrlParser: true,
-        useFindAndModify: true
-      }
-    );
+    this.mongoConnection = mongoose.connect(process.env.MONGO_URL, {
+      useNewUrlParser: true,
+      useFindAndModify: true
+    });
   }
 }
 export default new App().server;

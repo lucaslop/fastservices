@@ -1,4 +1,4 @@
-import Appointments from "../models/appointments";
+import Appointments from "../models/Appointments";
 import { startOfDay, endOfDay } from "date-fns";
 import { Op } from "sequelize";
 
